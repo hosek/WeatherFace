@@ -29,18 +29,21 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async (url: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetchDataFromAPI(url);
-      setData(result);
-    } catch (err) {
-      setError(`Failed to load data (${err})`);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchData = useCallback(
+    async (url: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchDataFromAPI(url);
+        setData(result);
+      } catch (err) {
+        setError(`Failed to load data (${err})`);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, setError, setData],
+  );
 
   return (
     <DataContext.Provider value={{ data, fetchData, loading, error }}>

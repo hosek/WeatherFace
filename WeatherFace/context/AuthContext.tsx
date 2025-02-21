@@ -61,45 +61,54 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  const signIn = useCallback(async (formData: SignInFormData) => {
-    const dbUser = await getUserFromSecureStore();
-    if (dbUser) {
-      const currentUser = JSON.parse(dbUser);
-      bcrypt.compare(
-        formData.password,
-        currentUser.password,
-        (err, isMatch) => {
-          if (isMatch) {
-            dispatch({ type: 'SIGN_IN', payload: currentUser });
-          }
-        },
-      );
-      //TODO Wrong password state
-    }
-  }, []);
-
-  const signUp = useCallback(async (formData: SignUpFormData) => {
-    bcrypt.hash(formData.password, 10, async (err, hashedPassword) => {
-      if (hashedPassword) {
-        const newUser: User = { ...formData, password: hashedPassword };
-        await saveUserToSecureStore(newUser);
-        dispatch({ type: 'SIGN_UP', payload: newUser });
-      } else if (err) {
-        console.log(err);
+  const signIn = useCallback(
+    async (formData: SignInFormData) => {
+      const dbUser = await getUserFromSecureStore();
+      if (dbUser) {
+        const currentUser = JSON.parse(dbUser);
+        bcrypt.compare(
+          formData.password,
+          currentUser.password,
+          (err, isMatch) => {
+            if (isMatch) {
+              dispatch({ type: 'SIGN_IN', payload: currentUser });
+            }
+          },
+        );
+        //TODO Wrong password state
       }
-      //TODO Password hash error handling
-    });
-  }, []);
+    },
+    [dispatch],
+  );
 
-  const updateProfile = useCallback(async (user: User) => {
-    await saveUserToSecureStore(user);
-    dispatch({ type: 'UPDATE_PROFILE', payload: user });
-  }, []);
+  const signUp = useCallback(
+    async (formData: SignUpFormData) => {
+      bcrypt.hash(formData.password, 10, async (err, hashedPassword) => {
+        if (hashedPassword) {
+          const newUser: User = { ...formData, password: hashedPassword };
+          await saveUserToSecureStore(newUser);
+          dispatch({ type: 'SIGN_UP', payload: newUser });
+        } else if (err) {
+          console.log(err);
+        }
+        //TODO Password hash error handling
+      });
+    },
+    [dispatch],
+  );
+
+  const updateProfile = useCallback(
+    async (user: User) => {
+      await saveUserToSecureStore(user);
+      dispatch({ type: 'UPDATE_PROFILE', payload: user });
+    },
+    [dispatch],
+  );
 
   const signOut = useCallback(async () => {
     await removeUserFromSecureStore();
     dispatch({ type: 'SIGN_OUT' });
-  }, []);
+  }, [dispatch]);
 
   return (
     <AuthContext.Provider

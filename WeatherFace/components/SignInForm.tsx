@@ -28,7 +28,7 @@ export default function SignInForm({
           .required(t('passwordRequired'))
           .min(8, t('passwordMinLength')),
       }),
-    [],
+    [t],
   );
 
   const {

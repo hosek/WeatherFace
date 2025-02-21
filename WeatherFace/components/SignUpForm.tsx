@@ -18,7 +18,6 @@ import { ErrorText } from '@/components/ui/ErrorText';
 import { SignUpFormData, City } from '@/types';
 import { ThemedText } from '@/components/ThemedText';
 
-
 //FIX think about different layout - now if user switch to sign up screen, there is flat list inside Scrollview (Paralax)
 export default function SignUpForm({
   onSubmit,
@@ -62,7 +61,7 @@ export default function SignUpForm({
             }),
           ),
       }),
-    [],
+    [t],
   );
 
   const {
@@ -105,7 +104,7 @@ export default function SignUpForm({
       trigger();
       setModalVisible(false);
     },
-    [cities],
+    [cities, setCities, setValue, setModalVisible],
   );
 
   return (

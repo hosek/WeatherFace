@@ -26,15 +26,18 @@ export default function CitiesScreen() {
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
 
-  const handleCityPress = useCallback(async (city: City) => {
-    setSelectedCity(city);
-    await fetchData(getWeatherUrlForCity(city.name));
-    setIsModalVisible(true);
-  }, []);
+  const handleCityPress = useCallback(
+    async (city: City) => {
+      setSelectedCity(city);
+      await fetchData(getWeatherUrlForCity(city.name));
+      setIsModalVisible(true);
+    },
+    [setSelectedCity, fetchData, setIsModalVisible],
+  );
 
   const closeModal = useCallback(() => {
     setIsModalVisible(false);
-  }, []);
+  }, [setIsModalVisible]);
 
   useEffect(() => {
     if (state.user?.cities && state.user.cities.length > 0) {

@@ -47,20 +47,20 @@ export default function ProfileScreen() {
           .string()
           .phone('CZ', t('validPhone'))
           .required(t('phoneRequired')),
-                cities: yup
-                  .array()
-                  .min(1, t('minCity'))
-                  .required(t('minCity'))
-                  .of(
-                    yup.object().shape({
-                      name: yup.string().required(),
-                      address: yup.object().shape({
-                        postCode: yup.number().required(),
-                      }),
-                    }),
-                  ),
+        cities: yup
+          .array()
+          .min(1, t('minCity'))
+          .required(t('minCity'))
+          .of(
+            yup.object().shape({
+              name: yup.string().required(),
+              address: yup.object().shape({
+                postCode: yup.number().required(),
+              }),
+            }),
+          ),
       }),
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -88,9 +88,12 @@ export default function ProfileScreen() {
     },
   });
 
-  const onSubmit = (data: User) => {
-    updateProfile(data);
-  };
+  const onSubmit = useCallback(
+    (data: User) => {
+      updateProfile(data);
+    },
+    [updateProfile],
+  );
 
   const handleSignOut = useCallback(async () => {
     await signOut();
@@ -118,7 +121,7 @@ export default function ProfileScreen() {
       setModalVisible(false);
       setEditingCity(null);
     },
-    [cities],
+    [cities, setSelectedCity, setModalVisible, setEditingCity, setCities],
   );
 
   // FIXME Add delete confirmation
@@ -136,7 +139,7 @@ export default function ProfileScreen() {
         setSelectedCity(filteredCities[0] || null);
       }
     },
-    [cities],
+    [cities, setCities, setSelectedCity],
   );
 
   //TODO Extract profile edit fields to separate component

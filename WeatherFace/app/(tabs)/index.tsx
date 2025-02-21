@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const schema = useMemo(
     () =>
       yup.object().shape({ name: yup.string().required(t('cityRequired')) }),
-    [],
+    [t],
   );
 
   const {
