@@ -47,13 +47,23 @@ export default function ProfileScreen() {
           .string()
           .phone('CZ', t('validPhone'))
           .required(t('phoneRequired')),
-        city: yup.string().required('City is required'),
+                cities: yup
+                  .array()
+                  .min(1, t('minCity'))
+                  .required(t('minCity'))
+                  .of(
+                    yup.object().shape({
+                      name: yup.string().required(),
+                      address: yup.object().shape({
+                        postCode: yup.number().required(),
+                      }),
+                    }),
+                  ),
       }),
     [],
   );
 
   useEffect(() => {
-    console.log('profile');
     if (state.user) {
       setCities(state.user.cities);
       setValue('email', state.user.email);
@@ -74,7 +84,7 @@ export default function ProfileScreen() {
     defaultValues: {
       email: '',
       phoneNumber: '',
-      city: selectedCity?.name || 'No city',
+      cities: [],
     },
   });
 
@@ -99,13 +109,11 @@ export default function ProfileScreen() {
         );
         if (selectedCity.address.postCode === editingCity.address.postCode) {
           setSelectedCity({ ...selectedCity, name, address: { postCode } });
-          setValue('city', name);
         }
       } else {
         const newCity = { name, address: { postCode: Number(postCode) } };
         setCities([...cities, newCity]);
         setSelectedCity(newCity);
-        setValue('city', name);
       }
       setModalVisible(false);
       setEditingCity(null);
@@ -126,7 +134,6 @@ export default function ProfileScreen() {
       setCities(filteredCities);
       if (selectedCity.address.postCode === postCode) {
         setSelectedCity(filteredCities[0] || null);
-        setValue('city', filteredCities[0]?.name || '');
       }
     },
     [cities],
@@ -194,7 +201,6 @@ export default function ProfileScreen() {
           selectedValue={selectedCity?.name}
           onValueChange={itemValue => {
             setSelectedCity(cities.find(city => city.name === itemValue)!);
-            setValue('city', itemValue);
           }}
         >
           {cities.map(city => (
