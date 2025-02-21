@@ -45,7 +45,7 @@ export default function ProfileScreen() {
           .email(t('invalidEmail')),
         phoneNumber: yup
           .string()
-          .phone('CZ', t('validPhone'))
+          .phone('CZ', t('validPhone')) //FIXME change validation state rule regarding device locale
           .required(t('phoneRequired')),
         cities: yup
           .array()

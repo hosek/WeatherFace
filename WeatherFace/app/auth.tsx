@@ -23,7 +23,6 @@ const AuthScreen = () => {
   }, []);
 
   const handleSignUp = useCallback(async (formData: SignUpFormData) => {
-    console.log('handleSignUp');
     await signUp(formData);
     router.replace('/(tabs)');
   }, []);

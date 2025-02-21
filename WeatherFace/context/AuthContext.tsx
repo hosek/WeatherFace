@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const signOut = useCallback(async () => {
-    await removeUserFromSecureStore();
+    //await removeUserFromSecureStore(); //We cant erase signed up user because of dummy login page
     dispatch({ type: 'SIGN_OUT' });
   }, [dispatch]);
 
