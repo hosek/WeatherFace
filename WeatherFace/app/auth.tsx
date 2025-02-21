@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, Button, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+
 import { SignUpFormData, SignInFormData } from '@/types';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedView } from '@/components/ThemedView';
@@ -16,15 +17,16 @@ const AuthScreen = () => {
   const router = useRouter();
   const [showSignUp, setShowSignUp] = useState(false);
 
-  const handleSignIn = async (formData: SignInFormData) => {
+  const handleSignIn = useCallback(async (formData: SignInFormData) => {
     await signIn(formData);
     router.replace('/(tabs)');
-  };
+  }, []);
 
-  const handleSignUp = async (formData: SignUpFormData) => {
+  const handleSignUp = useCallback(async (formData: SignUpFormData) => {
+    console.log('handleSignUp');
     await signUp(formData);
     router.replace('/(tabs)');
-  };
+  }, []);
 
   return (
     <ParallaxScrollView
@@ -40,11 +42,11 @@ const AuthScreen = () => {
         <SignUpForm onSubmit={handleSignUp} />
       ) : (
         <>
-        <SignInForm onSubmit={handleSignIn} />
-        <ThemedView style={styles.stepContainer}>
-        <ThemedText>{t('noAccount')}</ThemedText>
-        <Button title={t('signUp')} onPress={() => setShowSignUp(true)} />
-        </ThemedView>
+          <SignInForm onSubmit={handleSignIn} />
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText>{t('noAccount')}</ThemedText>
+            <Button title={t('signUp')} onPress={() => setShowSignUp(true)} />
+          </ThemedView>
         </>
       )}
     </ParallaxScrollView>

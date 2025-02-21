@@ -5,13 +5,14 @@ import React, {
   useReducer,
   ReactNode,
 } from 'react';
+import bcrypt from 'react-native-bcrypt';
+
 import {
   saveUserToSecureStore,
   getUserFromSecureStore,
   removeUserFromSecureStore,
 } from '@/utils/SecureStore';
 import { User, SignInFormData, SignUpFormData } from '@/types';
-import bcrypt from 'react-native-bcrypt';
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -62,7 +63,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = useCallback(async (formData: SignInFormData) => {
     const dbUser = await getUserFromSecureStore();
-    console.log('-------------- ab user ----------- ', dbUser);
     if (dbUser) {
       const currentUser = JSON.parse(dbUser);
       bcrypt.compare(
@@ -82,7 +82,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     bcrypt.hash(formData.password, 10, async (err, hashedPassword) => {
       if (hashedPassword) {
         const newUser: User = { ...formData, password: hashedPassword };
-        console.log('newUser ', JSON.stringify(newUser));
         await saveUserToSecureStore(newUser);
         dispatch({ type: 'SIGN_UP', payload: newUser });
       } else if (err) {

@@ -1,6 +1,4 @@
-import {
-  ActivityIndicator,
-} from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { ErrorText } from '@/components/ui/ErrorText';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -20,11 +18,17 @@ export function WeatherView({ loading, error, data }: WeatherPropsType) {
       {error && <ErrorText>{error}</ErrorText>}
       {data && (
         <ThemedView>
-          <ThemedText>{t('weatherIn')} {data.name}</ThemedText>
+          <ThemedText>
+            {t('weatherIn')} {data.name}
+          </ThemedText>
           <ThemedText>{data.main.temp}°C</ThemedText>
           <ThemedText>{data.weather[0].description}</ThemedText>
-          <ThemedText>{t('humidity')}: {data.main.humidity}%</ThemedText>
-          <ThemedText>{t('windSpeed')}: {data.wind.speed} m/s</ThemedText>
+          <ThemedText>
+            {t('humidity')}: {data.main.humidity}%
+          </ThemedText>
+          <ThemedText>
+            {t('windSpeed')}: {data.wind.speed} m/s
+          </ThemedText>
         </ThemedView>
       )}
     </>

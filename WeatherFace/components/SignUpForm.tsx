@@ -1,10 +1,4 @@
-import React, { useState } from 'react';
-import * as yup from 'yup';
-import 'yup-phone-lite';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { SignUpFormData, City } from '@/types';
-import { ThemedText } from '@/components/ThemedText';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Button,
@@ -12,45 +6,68 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
+import * as yup from 'yup';
+import 'yup-phone-lite';
 import { useTranslation } from 'react-i18next';
-import { ErrorText } from '@/components/ui/ErrorText';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
-export default function SignUpForm(props: {
+import { ErrorText } from '@/components/ui/ErrorText';
+import { SignUpFormData, City } from '@/types';
+import { ThemedText } from '@/components/ThemedText';
+
+export default function SignUpForm({
+  onSubmit,
+}: {
   onSubmit: (data: SignUpFormData) => void;
 }) {
   const { t } = useTranslation();
-  const [newCityName, setNewCityName] = useState('');
-  const [newPostalCode, setNewPostalCode] = useState('');
+  const [editingCity, setEditingCity] = useState<null | City>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [cities, setCities] = useState<City[]>([]);
 
-  const schema = yup.object().shape({
-    email: yup.string().required(t('emailRequired')).email(t('invalidEmail')),
-    password: yup
-      .string()
-      .required(t('passwordRequired'))
-      .min(8, t('passwordMinLength')),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref('password'), undefined], t('passwordsMustMatch'))
-      .required(t('enterPasswordAgain')),
-    phoneNumber: yup
-      .string()
-      .phone('CZ', t('validPhone'))
-      .required(t('phoneRequired')),
-    cities: yup.array().of(
+  const schema = useMemo(
+    () =>
       yup.object().shape({
-        name: yup.string().required(),
-        address: yup.object().shape({
-          postCode: yup.number().required(),
-        }),
+        email: yup
+          .string()
+          .required(t('emailRequired'))
+          .email(t('invalidEmail')),
+        password: yup
+          .string()
+          .required(t('passwordRequired'))
+          .min(8, t('passwordMinLength')),
+        confirmPassword: yup
+          .string()
+          .oneOf([yup.ref('password'), undefined], t('passwordsMustMatch'))
+          .required(t('enterPasswordAgain')),
+        phoneNumber: yup
+          .string()
+          .phone('CZ', t('validPhone'))
+          .required(t('phoneRequired')),
+        cities: yup
+          .array()
+          .min(1, t('minCity'))
+          .required(t('minCity'))
+          .of(
+            yup.object().shape({
+              name: yup.string().required(),
+              address: yup.object().shape({
+                postCode: yup.number().required(),
+              }),
+            }),
+          ),
       }),
-    ),
-  });
+    [],
+  );
 
   const {
     control,
     handleSubmit,
+    trigger,
+    setValue,
     formState: { errors },
   } = useForm<SignUpFormData>({
     resolver: yupResolver(schema),
@@ -63,32 +80,31 @@ export default function SignUpForm(props: {
     },
   });
 
-  const { onSubmit } = props;
+  const addCitiesAndSubmit = useCallback(
+    (data: SignUpFormData) => {
+      onSubmit(data);
+    },
+    [cities],
+  );
 
-  //FIXME Find better way to add cities data
-  const addCitiesAndSubmit = (data: SignUpFormData) => {
-    const finalData = { ...data, cities: cities };
-    onSubmit(finalData);
-  };
-
-  const handleCityPress = (cityId: string) => {
+  const handleCityPress = useCallback((cityId: string) => {
     //TODO add delete option
-  };
+  }, []);
 
-  const handleNewPostalCode = (text: string) => {
-    const numericValue = text.replace(/[^0-9]/g, '');
-    setNewPostalCode(numericValue);
-  };
-
-  const addCity = () => {
-    const newCity = {
-      name: newCityName,
-      address: { postCode: parseInt(newPostalCode) },
-    };
-    setCities([...cities, newCity]);
-    setNewCityName('');
-    setNewPostalCode('');
-  };
+  //TODO check for unique post code - used as id
+  const handleSaveCity = useCallback(
+    (name: string, postCode: number) => {
+      const newCity = {
+        name: name,
+        address: { postCode: postCode },
+      };
+      setCities([...cities, newCity]);
+      setValue('cities', [...cities, newCity]);
+      trigger();
+      setModalVisible(false);
+    },
+    [cities],
+  );
 
   return (
     <View>
@@ -101,6 +117,7 @@ export default function SignUpForm(props: {
               value={value}
               onChangeText={onChange}
               placeholder={t('email')}
+              keyboardType="email-address"
             />
           )}
           name="email"
@@ -150,6 +167,7 @@ export default function SignUpForm(props: {
               value={value}
               onChangeText={onChange}
               placeholder={t('phoneNumber')}
+              keyboardType="phone-pad"
             />
           )}
           name="phoneNumber"
@@ -159,19 +177,6 @@ export default function SignUpForm(props: {
         )}
       </View>
       <View>
-        <TextInput
-          value={newCityName}
-          onChangeText={setNewCityName}
-          placeholder={t('cityName')}
-        />
-        <TextInput
-          value={newPostalCode}
-          keyboardType="numeric"
-          onChangeText={handleNewPostalCode}
-          placeholder={t('postalCode')}
-        />
-        <Button title={t('addCity')} onPress={addCity} />
-
         <FlatList
           data={cities}
           nestedScrollEnabled={true}
@@ -188,7 +193,59 @@ export default function SignUpForm(props: {
             </TouchableOpacity>
           )}
         />
+        {errors.cities && <ErrorText>{errors.cities.message}</ErrorText>}
+        <Button
+          title={t('addNewCity')}
+          onPress={() => {
+            setEditingCity(null);
+            setModalVisible(true);
+          }}
+        />
       </View>
+      <Modal visible={modalVisible} animationType="fade">
+        <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+          <ThemedText
+            style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}
+          >
+            {t('addNewCity')}
+          </ThemedText>
+          <ThemedText type="subtitle">{t('cityName')}</ThemedText>
+          <TextInput
+            value={editingCity?.name}
+            onChangeText={text =>
+              setEditingCity(prev => ({
+                ...(prev || { address: { postCode: 0 } }),
+                name: text,
+              }))
+            }
+          />
+          <ThemedText type="subtitle">{t('postalCode')}</ThemedText>
+          <TextInput
+            value={editingCity?.address.postCode?.toString() || ''}
+            onChangeText={text =>
+              setEditingCity(prev => ({
+                ...(prev || { name: '', address: { postCode: 0 } }),
+                address: { postCode: Number(text) },
+              }))
+            }
+            keyboardType="numeric"
+          />
+          <Button
+            title="Save"
+            onPress={() =>
+              handleSaveCity(
+                editingCity?.name || '',
+                editingCity?.address?.postCode || 0,
+              )
+            }
+          />
+          <Button
+            title="Cancel"
+            onPress={() => setModalVisible(false)}
+            color="gray"
+          />
+        </View>
+      </Modal>
       <Button title={t('signUp')} onPress={handleSubmit(addCitiesAndSubmit)} />
     </View>
   );

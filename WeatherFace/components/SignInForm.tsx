@@ -1,25 +1,35 @@
-import React from 'react';
-import * as yup from 'yup';
+import React, { useMemo } from 'react';
 import { View, Button } from 'react-native';
+import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
+
 import { SignInFormData } from '@/types';
 import { ThemedInput } from '@/components/ThemedInput';
 import { ThemedText } from '@/components/ThemedText';
 import { ErrorText } from '@/components/ui/ErrorText';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useTranslation } from 'react-i18next';
 
-export default function SignInForm(props: {
+export default function SignInForm({
+  onSubmit,
+}: {
   onSubmit: (data: SignInFormData) => void;
 }) {
   const { t } = useTranslation();
-  const schema = yup.object().shape({
-    email: yup.string().required(t('emailRequired')).email(t('invalidEmail')),
-    password: yup
-      .string()
-      .required(t('passwordRequired'))
-      .min(8, t('passwordMinLength')),
-  });
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        email: yup
+          .string()
+          .required(t('emailRequired'))
+          .email(t('invalidEmail')),
+        password: yup
+          .string()
+          .required(t('passwordRequired'))
+          .min(8, t('passwordMinLength')),
+      }),
+    [],
+  );
 
   const {
     control,
@@ -32,7 +42,6 @@ export default function SignInForm(props: {
       password: '12345678',
     },
   });
-  const { onSubmit } = props;
 
   return (
     <View>
@@ -46,6 +55,7 @@ export default function SignInForm(props: {
               value={value}
               onChangeText={onChange}
               placeholder={t('email')}
+              keyboardType="email-address"
             />
           )}
           name="email"

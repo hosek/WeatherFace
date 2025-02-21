@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import * as yup from 'yup';
-import { WeatherSearch } from '@/types';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Image, StyleSheet, Button } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+
+import { WeatherSearch } from '@/types';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -14,7 +16,6 @@ import { WeatherView } from '@/components/WeatherView';
 import { useAuth } from '@/hooks/useAuth';
 import { useDataContext } from '@/context/DataContext';
 import { getWeatherUrlForCity } from '@/constants/WeatherService';
-import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
   const { state } = useAuth();
@@ -22,9 +23,11 @@ export default function HomeScreen() {
   const { data, fetchData, loading, error } = useDataContext();
   const [email, setEmail] = useState('');
 
-  const schema = yup
-    .object()
-    .shape({ name: yup.string().required(t('cityRequired')) });
+  const schema = useMemo(
+    () =>
+      yup.object().shape({ name: yup.string().required(t('cityRequired')) }),
+    [],
+  );
 
   const {
     control,
@@ -39,13 +42,13 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (state.user) {
-        setEmail(state.user.email);
+      setEmail(state.user.email);
     }
   }, [state]);
 
-  const handleSearch = async (data: WeatherSearch) => {
+  const handleSearch = useCallback(async (data: WeatherSearch) => {
     await fetchData(getWeatherUrlForCity(data.name));
-  };
+  }, []);
 
   return (
     <ParallaxScrollView
@@ -58,7 +61,9 @@ export default function HomeScreen() {
       }
     >
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">{t('welcome')}, {email}!</ThemedText>
+        <ThemedText type="title">
+          {t('welcome')}, {email}!
+        </ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>

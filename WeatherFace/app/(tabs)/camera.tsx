@@ -1,12 +1,10 @@
-import {  StyleSheet } from 'react-native';
+import { Button, Text, View, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { Button, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 export default function CameraScreen() {
   const { t } = useTranslation();
   const [permission, requestPermission] = useCameraPermissions();
-
 
   if (!permission) {
     return <View />;
@@ -15,9 +13,7 @@ export default function CameraScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>
-          {t('camPermission')}
-        </Text>
+        <Text style={styles.message}>{t('camPermission')}</Text>
         <Button onPress={requestPermission} title={t('grantPermission')} />
       </View>
     );

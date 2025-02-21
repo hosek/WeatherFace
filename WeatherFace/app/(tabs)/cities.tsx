@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { City } from '@/types';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   Platform,
@@ -9,13 +8,15 @@ import {
   Modal,
   Button,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+
+import { City } from '@/types';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { WeatherView } from '@/components/WeatherView';
 import { useAuth } from '@/hooks/useAuth';
 import { useDataContext } from '@/context/DataContext';
 import { getWeatherUrlForCity } from '@/constants/WeatherService';
-import { useTranslation } from 'react-i18next';
 
 export default function CitiesScreen() {
   const { state } = useAuth();
@@ -25,19 +26,19 @@ export default function CitiesScreen() {
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
 
-  const handleCityPress = async (city: City) => {
+  const handleCityPress = useCallback(async (city: City) => {
     setSelectedCity(city);
     await fetchData(getWeatherUrlForCity(city.name));
     setIsModalVisible(true);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalVisible(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (state.user?.cities && state.user.cities.length > 0) {
-        setCities(state.user.cities);
+      setCities(state.user.cities);
     }
   }, [state]);
 

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from 'react';
 import { fetchDataFromAPI } from '@/services/dataService';
 
 type DataContextType = {
@@ -23,7 +29,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async (url: string) => {
+  const fetchData = useCallback(async (url: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -34,7 +40,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <DataContext.Provider value={{ data, fetchData, loading, error }}>
