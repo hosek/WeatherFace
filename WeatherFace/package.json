@@ -21,6 +21,7 @@
     "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
+    "@testing-library/react-native": "^13.0.1",
     "expo": "~52.0.35",
     "expo-blur": "~14.0.3",
     "expo-camera": "~16.0.16",
@@ -61,7 +62,9 @@
     "jest-expo": "~52.0.4",
     "prettier": "3.5.1",
     "react-test-renderer": "18.3.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~8.0.1"
   },
   "private": true
 }

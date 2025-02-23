@@ -10,7 +10,7 @@ const AuthMiddleware = ({ children }: { children: React.ReactNode }) => {
     if (!state.isAuthenticated) {
       router.replace('/auth');
     }
-  }, [state.isAuthenticated]);
+  }, [state.isAuthenticated, router]);
 
   return <>{children}</>;
 };

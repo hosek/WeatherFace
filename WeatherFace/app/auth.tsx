@@ -17,15 +17,21 @@ const AuthScreen = () => {
   const router = useRouter();
   const [showSignUp, setShowSignUp] = useState(false);
 
-  const handleSignIn = useCallback(async (formData: SignInFormData) => {
-    await signIn(formData);
-    router.replace('/(tabs)');
-  }, []);
+  const handleSignIn = useCallback(
+    async (formData: SignInFormData) => {
+      await signIn(formData);
+      router.replace('/(tabs)');
+    },
+    [router, signIn],
+  );
 
-  const handleSignUp = useCallback(async (formData: SignUpFormData) => {
-    await signUp(formData);
-    router.replace('/(tabs)');
-  }, []);
+  const handleSignUp = useCallback(
+    async (formData: SignUpFormData) => {
+      await signUp(formData);
+      router.replace('/(tabs)');
+    },
+    [router, signUp],
+  );
 
   return (
     <ParallaxScrollView

@@ -38,8 +38,8 @@ export default function SignInForm({
   } = useForm<SignInFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      email: 'john@example.com',
-      password: '12345678',
+      email: '',
+      password: '',
     },
   });
 
@@ -53,6 +53,7 @@ export default function SignInForm({
           render={({ field: { onChange, value } }) => (
             <ThemedInput
               value={value}
+              testID="email-input"
               onChangeText={onChange}
               placeholder={t('email')}
               keyboardType="email-address"
@@ -67,6 +68,7 @@ export default function SignInForm({
           render={({ field: { onChange, value } }) => (
             <ThemedInput
               value={value}
+              testID="password-input"
               onChangeText={onChange}
               placeholder={t('password')}
               secureTextEntry
@@ -76,7 +78,7 @@ export default function SignInForm({
         />
         {errors.password && <ErrorText>{errors.password.message}</ErrorText>}
       </View>
-      <Button title={t('signIn')} onPress={handleSubmit(onSubmit)} />
+      <Button testID="signin-button" title={t('signIn')} onPress={handleSubmit(onSubmit)} />
     </View>
   );
 }

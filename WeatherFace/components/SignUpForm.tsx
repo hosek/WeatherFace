@@ -73,10 +73,10 @@ export default function SignUpForm({
   } = useForm<SignUpFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      email: 'john@example.com',
-      password: '12345678',
-      confirmPassword: '12345678',
-      phoneNumber: '+420777123456',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phoneNumber: '',
       cities: [],
     },
   });
@@ -85,7 +85,7 @@ export default function SignUpForm({
     (data: SignUpFormData) => {
       onSubmit(data);
     },
-    [cities],
+    [onSubmit],
   );
 
   const handleCityPress = useCallback((cityId: string) => {
@@ -104,7 +104,7 @@ export default function SignUpForm({
       trigger();
       setModalVisible(false);
     },
-    [cities, setCities, setValue, setModalVisible],
+    [cities, setCities, trigger, setValue, setModalVisible],
   );
 
   return (
@@ -197,6 +197,7 @@ export default function SignUpForm({
         {errors.cities && <ErrorText>{errors.cities.message}</ErrorText>}
         <Button
           title={t('addNewCity')}
+          testID="addcity-button"
           onPress={() => {
             setEditingCity(null);
             setModalVisible(true);
@@ -213,6 +214,7 @@ export default function SignUpForm({
           <ThemedText type="subtitle">{t('cityName')}</ThemedText>
           <TextInput
             value={editingCity?.name}
+            testID="cityname-input"
             onChangeText={text =>
               setEditingCity(prev => ({
                 ...(prev || { address: { postCode: 0 } }),
@@ -223,6 +225,7 @@ export default function SignUpForm({
           <ThemedText type="subtitle">{t('postalCode')}</ThemedText>
           <TextInput
             value={editingCity?.address.postCode?.toString() || ''}
+            testID="postcode-input"
             onChangeText={text =>
               setEditingCity(prev => ({
                 ...(prev || { name: '', address: { postCode: 0 } }),

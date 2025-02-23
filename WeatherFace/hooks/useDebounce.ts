@@ -16,13 +16,16 @@ export function useDebounce<Func extends SomeFunction>(
     };
   }, []);
 
-  const debouncedFunction = useCallback((...args: any) => {
-    const newTimer = setTimeout(() => {
-      func(...args);
-    }, delay);
-    clearTimeout(timer.current);
-    timer.current = newTimer;
-  }, []);
+  const debouncedFunction = useCallback(
+    (...args: any) => {
+      const newTimer = setTimeout(() => {
+        func(...args);
+      }, delay);
+      clearTimeout(timer.current);
+      timer.current = newTimer;
+    },
+    [delay, func],
+  );
 
   return debouncedFunction;
 }

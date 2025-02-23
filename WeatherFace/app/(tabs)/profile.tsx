@@ -63,17 +63,6 @@ export default function ProfileScreen() {
     [t],
   );
 
-  useEffect(() => {
-    if (state.user) {
-      setCities(state.user.cities);
-      setValue('email', state.user.email);
-      setValue('phoneNumber', state.user.phoneNumber);
-      if (state.user.cities.length > 0) {
-        setSelectedCity(state.user.cities[0]);
-      }
-    }
-  }, [state]);
-
   const {
     control,
     handleSubmit,
@@ -88,6 +77,17 @@ export default function ProfileScreen() {
     },
   });
 
+  useEffect(() => {
+    if (state.user) {
+      setCities(state.user.cities);
+      setValue('email', state.user.email);
+      setValue('phoneNumber', state.user.phoneNumber);
+      if (state.user.cities.length > 0) {
+        setSelectedCity(state.user.cities[0]);
+      }
+    }
+  }, [state, setValue, setCities, setSelectedCity]);
+
   const onSubmit = useCallback(
     (data: User) => {
       updateProfile(data);
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
   const handleSignOut = useCallback(async () => {
     await signOut();
     router.replace('/auth'); // Redirect to sign-in page
-  }, []);
+  }, [signOut, router]);
 
   const handleSaveCity = useCallback(
     (name: string, postCode: number) => {
@@ -121,13 +121,21 @@ export default function ProfileScreen() {
       setModalVisible(false);
       setEditingCity(null);
     },
-    [cities, setSelectedCity, setModalVisible, setEditingCity, setCities],
+    [
+      cities,
+      editingCity,
+      selectedCity,
+      setSelectedCity,
+      setModalVisible,
+      setEditingCity,
+      setCities,
+    ],
   );
 
   // FIXME Add delete confirmation
   const handleDeleteCity = useCallback(
     (postCode: number) => {
-      if (cities.length == 1) {
+      if (cities.length === 1) {
         Alert.alert(t('lastCity'));
         return;
       }
@@ -139,7 +147,7 @@ export default function ProfileScreen() {
         setSelectedCity(filteredCities[0] || null);
       }
     },
-    [cities, setCities, setSelectedCity],
+    [cities, selectedCity, t, setCities, setSelectedCity],
   );
 
   //TODO Extract profile edit fields to separate component

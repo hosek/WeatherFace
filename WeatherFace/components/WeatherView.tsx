@@ -14,7 +14,7 @@ export function WeatherView({ loading, error, data }: WeatherPropsType) {
   const { t } = useTranslation();
   return (
     <>
-      {loading && <ActivityIndicator size="large" />}
+      {loading && <ActivityIndicator size="large" testID="loading-indicator"/>}
       {error && <ErrorText>{error}</ErrorText>}
       {data && (
         <ThemedView>

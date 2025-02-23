@@ -46,9 +46,12 @@ export default function HomeScreen() {
     }
   }, [state]);
 
-  const handleSearch = useCallback(async (data: WeatherSearch) => {
-    await fetchData(getWeatherUrlForCity(data.name));
-  }, []);
+  const handleSearch = useCallback(
+    async (data: WeatherSearch) => {
+      await fetchData(getWeatherUrlForCity(data.name));
+    },
+    [fetchData],
+  );
 
   return (
     <ParallaxScrollView
